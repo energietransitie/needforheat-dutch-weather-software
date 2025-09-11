@@ -53,6 +53,26 @@ print(df.head(25))
 ```
 This prints the first 25 rows of a pandas DataFrame with interpolated weather parameters.
 
+When using [Grasshopper](https://www.grasshopper3d.com/) in combination with Python 3, you can use
+```
+# venv: ewf-tech
+# requirements: numpy==1.26.4, scipy==1.13.1, pandas==2.2.2,pytz==2025.2, git+https://github.com/energietransitie/needforheat-dutch-weather-software.git
+
+from weather import DutchWeather
+import pandas as pd
+
+# Retrieve interpolated weather for Windesheim, Zwolle
+df = DutchWeather.get_weather(
+    start=pd.Timestamp("2024-01-01 00:00:00", tz="Europe/Amsterdam"),
+    end=pd.Timestamp("2024-08-01 00:00:00", tz="Europe/Amsterdam"),
+    lat__degN=52.5012853331283,
+    lon__degE=6.07953737762913
+)
+
+# For Grasshopper: output dataframe on default port a
+a = df
+```
+
 ## Developing
 
 ### Prerequisites
