@@ -3,13 +3,18 @@
 This repository contains software to retrieve, process, and geospatially interpolate Dutch KNMI weather data.  
 
 ## Table of contents
-* [General info](#general-info)
-* [Deploying](#deploying)
-* [Developing](#developing)
-* [Features](#features)
-* [Status](#status)
-* [License](#license)
-* [Credits](#credits)
+- [Table of contents](#table-of-contents)
+- [General info](#general-info)
+- [Deploying](#deploying)
+  - [Prerequisites](#prerequisites)
+- [Usage](#usage)
+- [Developing](#developing)
+  - [Prerequisites](#prerequisites-1)
+  - [Contributing](#contributing)
+- [Features](#features)
+- [Status](#status)
+- [License](#license)
+- [Credits](#credits)
 
 ## General info
 This software retrieves hourly KNMI weather data (temperature, wind speed, solar radiation, etc.), processes the raw files, and applies geospatial interpolation to provide weather time series for arbitrary locations in the Netherlands.  
@@ -34,20 +39,19 @@ Main dependencies:
 Example: retrieve weather data for a single location and time span:
 
 ```python
-from weather_extraction import get_weather_timeseries
+from weather import DutchWeather
 import pandas as pd
 
-start = pd.Timestamp("2024-01-01T00:00:00Z")
-end   = pd.Timestamp("2024-01-07T23:00:00Z")
-
-df = get_weather_timeseries(
-    lat_degN=52.140,
-    lon_degE=6.200,
-    start=start,
-    end=end
+df = DutchWeather.get_weather(
+    start=pd.Timestamp("2024-01-01 00:00:00", tz="Europe/Amsterdam"),
+    end=pd.Timestamp("2024-01-02 00:00:00", tz="Europe/Amsterdam"),
+    lat__degN=52.5012853331283,
+    lon__degE=6.07953737762913
 )
+ 
+print(df.head(25))
 ```
-This returns a pandas DataFrame with interpolated weather parameters.
+This prints the first 25 rows of a pandas DataFrame with interpolated weather parameters.
 
 ## Developing
 
@@ -71,7 +75,7 @@ Please follow PEP8 style guidelines and include tests where relevant.
 Ready:
 * Retrieve raw hourly KNMI weather data
 * Parse and process KNMI station metadata
-* Geospatial interpolation to arbitrary lat/lon
+* Geospatial interpolation to arbitrary lat/lon in the Netherlands
 * Convenience function for single-location queries
 
 To-do:

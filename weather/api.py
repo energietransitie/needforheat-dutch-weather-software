@@ -16,7 +16,7 @@ class DutchWeather:
     """
 
     @staticmethod
-    def get_weather(lat__degN, lon__degE, start, end):
+    def get_weather(start, end, lat__degN, lon__degE):
         """
         Main convenience function: retrieve interpolated weather for one location.
 
@@ -43,6 +43,12 @@ class DutchWeather:
             "P": ("air_outdoor__Pa", 0.1 * 100),
             "U": ("air_outdoor_rel_humidity__0", 1 / 100),
         }
+
+        # --- guard against invalid interval ---
+        if end < start:
+            raise ValueError(
+                f"get_weather: end ({end}) must be >= start ({start})"
+            )
 
         weather_interval = pd.Interval(left=start, right=end, closed="both")
         df_weather = fetch_weather_data(weather_interval, metrics=metrics)

@@ -32,7 +32,7 @@ def interpolate_weather_data(
     
     
     # Iterate over each timestamp
-    for timestamp in tqdm(df_weather.index.get_level_values('timestamp').unique()):
+    for timestamp in tqdm(df_weather.index.get_level_values('timestamp').unique(), desc="Interpolating KNMI data geospatially"):
         df_timestamp = df_weather.xs(timestamp, level='timestamp')
         lat_lon = df_timestamp.index.values
         lat_lon_array = np.array([[lat__degN, lon__degE] for lat__degN, lon__degE in lat_lon])

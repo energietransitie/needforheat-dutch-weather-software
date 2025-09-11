@@ -119,15 +119,38 @@ def fetch_weather_data(time_interval,
     df_weather = pd.DataFrame()
     df_weather_chunk = pd.DataFrame()
     
+    # # Ensure the start date is included in the first chunk
+    # target__tz = time_interval.left.tzinfo
+    # start_date = time_interval.left.tz_convert('UTC').normalize()
+    # end_date = time_interval.right.tz_convert('UTC').normalize() + pd.Timedelta(days=1)
+    # first_chunk_start = pd.date_range(start=start_date, end=end_date, freq=chunk_freq)[0]
+    # first_chunk_start = first_chunk_start if start_date >= first_chunk_start else first_chunk_start - pd.Timedelta(chunk_freq)
+
     # Ensure the start date is included in the first chunk
     target__tz = time_interval.left.tzinfo
-    start_date = time_interval.left.tz_convert('UTC').normalize()
-    end_date = time_interval.right.tz_convert('UTC').normalize() + pd.Timedelta(days=1)
-    first_chunk_start = pd.date_range(start=start_date, end=end_date, freq=chunk_freq)[0]
-    first_chunk_start = first_chunk_start if start_date >= first_chunk_start else first_chunk_start - pd.Timedelta(chunk_freq)
+
+    if time_interval.right < time_interval.left:
+        raise ValueError("fetch_weather_data: end must be >= start")
+
+    start_date = time_interval.left.tz_convert("UTC").normalize()
+    end_date = time_interval.right.tz_convert("UTC").normalize() + pd.Timedelta(days=1)
+
+    chunk_starts = pd.date_range(start=start_date, end=end_date, freq=chunk_freq)
+
+    # Fall back to start_date if the range is too short
+    if len(chunk_starts) == 0:
+        first_chunk_start = start_date
+    else:
+        first_chunk_start = chunk_starts[0]
+
+    first_chunk_start = (
+        first_chunk_start
+        if start_date >= first_chunk_start
+        else first_chunk_start - pd.Timedelta(chunk_freq)
+    )
 
     # Iterate over date ranges using the specified frequency
-    for current_start in tqdm(pd.date_range(start=first_chunk_start, end=end_date, freq=chunk_freq)):
+    for current_start in tqdm(pd.date_range(start=first_chunk_start, end=end_date, freq=chunk_freq), desc="Downloading KNMI data"):
         current_end = min(end_date, current_start + pd.Timedelta(chunk_freq) - timedelta(seconds=1))
         current_start = max(start_date, current_start)
 
