@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "needforheat-dutch-weather-software"
+version = "0.1.0"
+description = "Retrieve and interpolate KNMI hourly weather data to arbitrary Dutch locations."
+authors = [
+  { name="Henri ter Hofte", email="henri.terhofte@outlook.com" }
+]
+license = { text = "Apache 2.0" }
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pandas>=1.5",
+    "numpy>=1.23",
+    "scipy>=1.10",
+    "tqdm>=4.65",
+    "requests>=2.31",
+    "ipywidgets>=8.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/energietransitie/needforheat-dutch-weather-software"
+Issues = "https://github.com/energietransitie/needforheat-dutch-weather-software/issues"
