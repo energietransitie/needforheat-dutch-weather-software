@@ -100,18 +100,28 @@ def process_knmi_weather_data(raw_data):
 
 def fetch_weather_data(time_interval,
                        chunk_freq="4W", 
-                       metrics={'T': ('temp_outdoor__degC', 0.1), # H Temperature (in 0.1 degrees Celsius) at 1.50 m at the time of observation
-                                'FH': ('wind__m_s_1', 0.1), # FH: Hourly mean wind speed (in 0.1 m/s)
-                                'Q': ('sol_sol_ghi__W_m_2', (100 * 100) / (60 * 60)) # Q: Global radiation (in J/cm^2) during the hourly division, 1 m^2 = 100 cm/m^2 * 100 cm/m^2, 1 h = 60 min/h * 60 s/min
-                                }
-                        ):
+                       metrics=None):
     """
     Fetch and process weather data in chunks over a specified period.
     
     Parameters:
     time_interval (pd.Interval): Closed interval for the data collection period.
     chunk_freq (str): Frequency for dividing the data collection period into chunks.
-    metrics (dict): Dictionary of metrics with a tuple specifying a property name following the physiquant__unit naming convention and conversion factor.
+    metrics : dict, optional
+        Mapping of KNMI variable codes to output names and conversion factors.
+        Each entry should be of the form:
+            KNMI_code: (output_column_name, factor)
+        Default metrics:
+            - "T": ("temp_outdoor__degC", 0.1)
+                Hourly temperature at 1.5 m in 0.1°C units, converted to ˚C.
+            - "FH": ("wind__m_s_1", 0.1)
+                Hourly mean wind speed in 0.1 m/s, converted to m/s.
+            - "Q": ("sol_ghi__W_m_2", (100*100)/(60*60))
+                Global horizontal radiation in J/cm² per hour, converted to W/m².
+            - "P": ("air_outdoor__Pa", 0.1*100)
+                Air pressure in hPa, converted to Pa.
+            - "U": ("air_outdoor_rel_humidity__0", 1/100)
+                Relative humidity in %, converted to fraction (0–1).
     
     Returns:
     pd.DataFrame: Processed weather data with multi-index of latitude, longitude, and timestamp. The timezone of time_interval.left.tzinfo (if any) is used as the target timezone for the timestamps.
@@ -126,6 +136,15 @@ def fetch_weather_data(time_interval,
     # first_chunk_start = pd.date_range(start=start_date, end=end_date, freq=chunk_freq)[0]
     # first_chunk_start = first_chunk_start if start_date >= first_chunk_start else first_chunk_start - pd.Timedelta(chunk_freq)
 
+    if metrics is None:
+        metrics = {
+            "T": ("temp_outdoor__degC", 0.1),
+            "FH": ("wind__m_s_1", 0.1),
+            "Q": ("sol_ghi__W_m_2", (100*100)/(60*60)),
+            "P": ("air_outdoor__Pa", 0.1*100),
+            "U": ("air_outdoor_rel_humidity__0", 1/100)
+        }
+    
     # Ensure the start date is included in the first chunk
     target__tz = time_interval.left.tzinfo
 
