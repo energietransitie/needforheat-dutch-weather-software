@@ -49,7 +49,7 @@ class DutchWeather:
                 - "Q": ("sol_ghi__W_m_2", (100*100)/(60*60))
                     Global horizontal radiation in J/cm² per hour, converted to W/m².
                 - "P": ("air_outdoor__Pa", 0.1*100)
-                    Air pressure in hPa, converted to Pa.
+                    Air pressure in 0.1 hPa, converted to Pa.
                 - "U": ("air_outdoor_rel_humidity__0", 1/100)
                     Relative humidity in %, converted to fraction (0–1).
         interpolate__min : int, optional
@@ -71,11 +71,11 @@ class DutchWeather:
 
         if metrics is None:
             metrics = {
-                "T": ("temp_outdoor__degC", 0.1),
-                "FH": ("wind__m_s_1", 0.1),
-                "Q": ("sol_ghi__W_m_2", (100*100)/(60*60)),
-                "P": ("air_outdoor__Pa", 0.1*100),
-                "U": ("air_outdoor_rel_humidity__0", 1/100)
+                "T": ("temp_outdoor__degC", 0.1),           # Hourly temperature at 1.5 m in 0.1°C units, converted to ˚C.
+                "FH": ("wind__m_s_1", 0.1),                 # Hourly mean wind speed in 0.1 m/s, converted to m/s.
+                "Q": ("sol_ghi__W_m_2", (100*100)/(60*60)), # Global horizontal radiation in J/cm² per hour, converted to W/m².
+                "P": ("air_outdoor__Pa", 0.1*100),          # Air pressure in 0.1 hPa, converted to Pa.
+                "U": ("air_outdoor_rel_humidity__0", 1/100) # Relative humidity in %, converted to fraction (0–1).
             }
 
         # --- guard against invalid interval ---
