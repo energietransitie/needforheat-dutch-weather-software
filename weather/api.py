@@ -6,7 +6,7 @@ Provides a DutchWeather class that wraps KNMI retrieval and interpolation.
 
 import pandas as pd
 from .knmi import fetch_hourly_dutch_weather_data
-from .geo_interpolate import geo_interpolate_weather_data, temporal_interpolate_weather_data
+from .weather_interpolate import geo_interpolate_weather_data, temporal_interpolate_weather_data
 
 
 class DutchWeather:
