@@ -5,8 +5,8 @@ Provides a DutchWeather class that wraps KNMI retrieval and interpolation.
 """
 
 import pandas as pd
-from .knmi import fetch_weather_data
-from .geo_interpolate import interpolate_weather_data
+from .knmi import fetch_hourly_dutch_weather_data
+from .geo_interpolate import geo_interpolate_weather_data, temporal_interpolate_weather_data
 
 
 class DutchWeather:
@@ -16,9 +16,10 @@ class DutchWeather:
     """
 
     @staticmethod
-    def get_weather(start, end, 
-                    lat__degN, lon__degE,
-                    metrics=None):
+    def get_interpolated_weather(start, end,
+                                 lat__degN, lon__degE,
+                                 interpolate__min=15,
+                                 metrics=None):
         """
         Retrieve interpolated hourly weather data for a single location in the Netherlands.
 
@@ -51,12 +52,14 @@ class DutchWeather:
                     Air pressure in hPa, converted to Pa.
                 - "U": ("air_outdoor_rel_humidity__0", 1/100)
                     Relative humidity in %, converted to fraction (0–1).
+        interpolate__min : int, optional
+            Target resolution (in minutes) for interpolation.
 
         Returns
         -------
         pandas.DataFrame
-            Hourly interpolated weather data for the target location.
-            Indexed by timestamp, with one column per requested metric.
+            Temporally and geospatially interpolated Dutch weather data for the target location.
+            Indexed by a MultiIndex(timestamp, metric).
 
         Notes
         -----
@@ -82,5 +85,9 @@ class DutchWeather:
             )
 
         weather_interval = pd.Interval(left=start, right=end, closed="both")
-        df_weather = fetch_weather_data(weather_interval, metrics=metrics)
-        return interpolate_weather_data(df_weather, lat__degN, lon__degE)
+        
+        return (
+            fetch_hourly_dutch_weather_data(weather_interval, metrics=metrics)
+            .pipe(geo_interpolate_weather_data, lat__degN=lat__degN, lon__degE=lon__degE)
+            .pipe(temporal_interpolate_weather_data, interpolate__min=interpolate__min)
+        )

@@ -98,11 +98,11 @@ def process_knmi_weather_data(raw_data):
         return df_weather_chunk
 
 
-def fetch_weather_data(time_interval,
-                       chunk_freq="4W", 
-                       metrics=None):
+def fetch_hourly_dutch_weather_data(time_interval,
+                                    chunk_freq="4W",
+                                    metrics=None):
     """
-    Fetch and process weather data in chunks over a specified period.
+    Fetch and process hourly Dutch weather data in chunks over a specified period.
     
     Parameters:
     time_interval (pd.Interval): Closed interval for the data collection period.
@@ -129,13 +129,6 @@ def fetch_weather_data(time_interval,
     df_weather = pd.DataFrame()
     df_weather_chunk = pd.DataFrame()
     
-    # # Ensure the start date is included in the first chunk
-    # target__tz = time_interval.left.tzinfo
-    # start_date = time_interval.left.tz_convert('UTC').normalize()
-    # end_date = time_interval.right.tz_convert('UTC').normalize() + pd.Timedelta(days=1)
-    # first_chunk_start = pd.date_range(start=start_date, end=end_date, freq=chunk_freq)[0]
-    # first_chunk_start = first_chunk_start if start_date >= first_chunk_start else first_chunk_start - pd.Timedelta(chunk_freq)
-
     if metrics is None:
         metrics = {
             "T": ("temp_outdoor__degC", 0.1),

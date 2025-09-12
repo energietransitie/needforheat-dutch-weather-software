@@ -1,6 +1,6 @@
 # NeedForHeat Dutch weather software
 
-This repository contains software to retrieve, process, and geospatially interpolate Dutch KNMI weather data.  
+This repository contains software to retrieve, process, and geospatially and temporally interpolate Dutch KNMI weather data.  
 
 ## Table of contents
 - [Table of contents](#table-of-contents)
@@ -17,7 +17,7 @@ This repository contains software to retrieve, process, and geospatially interpo
 - [Credits](#credits)
 
 ## General info
-This software retrieves hourly KNMI weather data (temperature, wind speed, solar radiation, etc.), processes the raw files, and applies geospatial interpolation to provide weather time series for arbitrary locations in the Netherlands.  
+This software retrieves hourly KNMI weather data (temperature, wind speed, solar radiation, etc.), processes the raw files, and applies geospatial and temporal interpolation to provide weather time series for arbitrary locations in the Netherlands.  
 
 The code builds on earlier developments in the Twomes, Brains4Buildings, and REDUCEDHEATCARB projects.  
 It is designed for integration with energy transition datasets such as [NeedForHeat](https://github.com/energietransitie/needforheat-dataset), but can also be used as a standalone tool.
@@ -42,35 +42,62 @@ Example: retrieve weather data for a single location and time span:
 from weather import DutchWeather
 import pandas as pd
 
-df = DutchWeather.get_weather(
+metrics = {
+                "T": ("temp_outdoor__degC", 0.1),
+                "FH": ("wind__m_s_1", 0.1),
+                "Q": ("sol_ghi__W_m_2", (100*100)/(60*60)),
+                "P": ("air_outdoor__Pa", 0.1*100),
+                "U": ("humidity_outdoor_rel__0", 1/100)
+            }
+
+df_weather = DutchWeather.get_interpolated_weather(
     start=pd.Timestamp("2024-01-01 00:00:00", tz="Europe/Amsterdam"),
     end=pd.Timestamp("2024-01-02 00:00:00", tz="Europe/Amsterdam"),
     lat__degN=52.5012853331283,
-    lon__degE=6.07953737762913
+    lon__degE=6.07953737762913,
+    interpolate__min=5,
+    metrics = metrics
 )
- 
-print(df.head(25))
+
+df_weather_props = df_weather["value"].unstack("property")
+
+temp_0_degC__K = 273.15
+df_weather_props['temp_outdoor__K'] = df_weather_props['temp_outdoor__degC'] + temp_0_degC__K
+
+print(df_weather_props.head(25))
 ```
 This prints the first 25 rows of a pandas DataFrame with interpolated weather parameters.
 
 When using [Grasshopper](https://www.grasshopper3d.com/) in combination with Python 3, you can use
-```
+
+```python
 # venv: ewf-tech
 # requirements: numpy==1.26.4, scipy==1.13.1, pandas==2.2.2,pytz==2025.2, git+https://github.com/energietransitie/needforheat-dutch-weather-software.git
 
-from weather import DutchWeather
-import pandas as pd
+metrics = {
+                "T": ("temp_outdoor__degC", 0.1),
+                "FH": ("wind__m_s_1", 0.1),
+                "Q": ("sol_ghi__W_m_2", (100*100)/(60*60)),
+                "P": ("air_outdoor__Pa", 0.1*100),
+                "U": ("humidity_outdoor_rel__0", 1/100)
+            }
 
-# Retrieve interpolated weather for Windesheim, Zwolle
-df = DutchWeather.get_weather(
+df_weather = DutchWeather.get_interpolated_weather(
     start=pd.Timestamp("2024-01-01 00:00:00", tz="Europe/Amsterdam"),
-    end=pd.Timestamp("2024-08-01 00:00:00", tz="Europe/Amsterdam"),
+    end=pd.Timestamp("2024-01-02 00:00:00", tz="Europe/Amsterdam"),
     lat__degN=52.5012853331283,
-    lon__degE=6.07953737762913
+    lon__degE=6.07953737762913,
+    interpolate__min=5,
+    metrics = metrics
 )
 
+df_weather_props = df_weather["value"].unstack("property")
+
+temp_0_degC__K = 273.15
+df_weather_props['temp_outdoor__K'] = df_weather_props['temp_outdoor__degC'] + temp_0_degC__K
+
 # For Grasshopper: output dataframe on default port a
-a = df
+a = df_weather_props
 ```
 
 ## Developing
@@ -96,6 +123,7 @@ Ready:
 * Retrieve raw hourly KNMI weather data
 * Parse and process KNMI station metadata
 * Geospatial interpolation to arbitrary lat/lon in the Netherlands
+* Temporal interpolation
 * Convenience function for single-location queries
 
 To-do:
@@ -115,6 +143,7 @@ This software was written by:
 * Henri ter Hofte · [@henriterhofte](https://github.com/henriterhofte)
 
 It was inspired by:
+* [needforheat-diagnosis-software](https://github.com/energietransitie/needforheat-diagnosis-software), by [@henriterhofte](https://github.com/henriterhofte) and contributors, licensed under [Apache 2.0](https://opensource.org/licenses/Apache-2.0)
 * [HourlyHistoricWeather](https://github.com/stephanpcpeters/HourlyHistoricWeather), by [@stephanpcpeters](https://github.com/stephanpcpeters), licensed under [an MIT-style licence](https://raw.githubusercontent.com/stephanpcpeters/HourlyHistoricWeather/master/historicdutchweather/LICENSE)
   
 We use and gratefully acknowledge the efforts of the makers of the following source code and libraries:
