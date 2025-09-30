@@ -39,7 +39,7 @@ Main dependencies:
 Example: retrieve weather data for a single location and time span:
 
 ```python
-from weather import DutchWeather
+from dutch_weather import DutchWeather
 import pandas as pd
 
 df_weather = DutchWeather.get_interpolated_weather(
