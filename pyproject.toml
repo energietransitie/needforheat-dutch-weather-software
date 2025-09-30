@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "needforheat-dutch-weather-software"
 version = "0.1.0"
-packages = ["dutch_weather"]
 description = "Retrieve and interpolate KNMI hourly weather data to arbitrary Dutch locations."
 authors = [
   { name="Henri ter Hofte", email="henri.terhofte@outlook.com" }
@@ -28,3 +27,6 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/energietransitie/needforheat-dutch-weather-software"
 Issues = "https://github.com/energietransitie/needforheat-dutch-weather-software/issues"
+
+[tool.setuptools]
+packages = ["dutch_weather"]
