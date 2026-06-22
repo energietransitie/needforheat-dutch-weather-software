@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "needforheat-dutch-weather-software"
-version = "0.1.0"
+version = "0.1.1"
 description = "Retrieve and interpolate KNMI hourly weather data to arbitrary Dutch locations."
 authors = [
   { name="Henri ter Hofte", email="henri.terhofte@outlook.com" }
@@ -17,7 +17,7 @@ requires-python = ">=3.9"
 
 
 dependencies = [
-    "pandas>=2.2,<3",
+    "pandas>=2.2,<4",
     "numpy>=1.26,<3",
     "scipy>=1.12,<2",
     "requests>=2.31,<3",
